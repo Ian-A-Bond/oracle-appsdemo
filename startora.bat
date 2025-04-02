@@ -16,7 +16,7 @@ REM
 REM Date         Name          Description
 REM ---------------------------------------------------------------------------------------
 REM 22/07/2022   Ian Bond      Created script
-REM 20/04/2023   Ian Bond      Amend call to sent_env.bat so that it does not prompt for the
+REM 20/04/2023   Ian Bond      Amend call to set_env.bat so that it does not prompt for the
 REM                            connect_user password.
 
 REM Setting evironment variables
