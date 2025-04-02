@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE util_date AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : util_date
@@ -12,6 +12,8 @@ CREATE OR REPLACE PACKAGE util_date AS
   ** Date            Name                 Description
   **------------------------------------------------------------------------
   ** 16/06/2022      Ian Bond             Program created
+  ** 21/08/2023      Ian Bond             Use to_number function when assigning 
+  **                                      char values to numeric variables. 
   **   
   */
 
@@ -93,7 +95,7 @@ CREATE OR REPLACE PACKAGE util_date AS
     p_saturday_workday IN BOOLEAN DEFAULT FALSE, 
     p_sunday_workday   IN BOOLEAN DEFAULT FALSE
     ) RETURN BOOLEAN;
-  
+
   /*
   ** is_a_holiday - Returns TRUE if specified date is a holiday
   **
@@ -130,7 +132,7 @@ CREATE OR REPLACE PACKAGE util_date AS
   **   p_country_id        - Check holiday dates for this country
   **   p_saturday_workday  - TRUE if Saturdays are working days
   **   p_sunday_workday    - TRUE if Sundays are working days
-  
+
   ** RETURN
   **   BOOLEAN   TRUE if the date is a working day 
   **             FALSE in all other cases
@@ -191,7 +193,7 @@ CREATE OR REPLACE PACKAGE util_date AS
   **
   ** Return the date of the last occurrence of the specified day of the week in the month.
   **
-  ** For example, to find the first Tuesday (day 2) in August 2022:
+  ** For example, to find the last Tuesday (day 2) in August 2022:
   **   l_last_date := util_date.last_day_month(to_date('01-AUG-22','DD-MON-RR'),2);
   **
   ** This will give the date 30-AUG-22 which is the last Tuesday in August.
@@ -266,7 +268,7 @@ CREATE OR REPLACE PACKAGE util_date AS
     p_saturday_workday IN BOOLEAN DEFAULT FALSE, 
     p_sunday_workday   IN BOOLEAN DEFAULT FALSE
     ) RETURN DATE;
- 
+
   /*
   ** working_days_between - Number of working days between two dates
   **                        INEFFICIENT METHOD
@@ -566,10 +568,9 @@ CREATE OR REPLACE PACKAGE util_date AS
 END util_date;
 /
 
-
 CREATE OR REPLACE PACKAGE BODY util_date AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : util_date
@@ -614,7 +615,7 @@ CREATE OR REPLACE PACKAGE BODY util_date AS
     v_weekend BOOLEAN := FALSE;
     v_day_no INTEGER := 0;
   BEGIN
-    v_day_no := to_char(p_date,'D');
+    v_day_no := to_number(to_char(p_date,'D'));
     CASE
       WHEN (NOT p_saturday_workday AND v_day_no = gc_saturday) 
       OR (NOT p_sunday_workday AND v_day_no = gc_sunday) THEN
@@ -702,7 +703,7 @@ CREATE OR REPLACE PACKAGE BODY util_date AS
     IF p_day_no < 1 OR p_day_no > 7 THEN
       RAISE out_of_range;
     END IF;
-    v_start_dayno := to_char(first_day(p_date),'D');
+    v_start_dayno := to_number(to_char(first_day(p_date),'D'));
     v_offset := (p_day_no - v_start_dayno);
     IF v_offset > 7 THEN
       v_offset := v_offset - 7;
@@ -730,7 +731,7 @@ CREATE OR REPLACE PACKAGE BODY util_date AS
     IF p_day_no < 1 OR p_day_no > 7 THEN
       RAISE out_of_range;
     END IF;
-    v_start_dayno := to_char(last_day(p_date),'D');
+    v_start_dayno := to_number(to_char(last_day(p_date),'D'));
     v_offset := (v_start_dayno - p_day_no);
     IF v_offset > 7 THEN
       v_offset := v_offset - 7;
@@ -837,12 +838,12 @@ CREATE OR REPLACE PACKAGE BODY util_date AS
       RETURN 0;
     END IF;
     v_total_days := (p_date_end - p_date_start) +1;
-    v_start_dayno := to_char(p_date_start,'D');
+    v_start_dayno := to_number(to_char(p_date_start,'D'));
     v_start_offset := c_days_in_week - (v_start_dayno+(c_days_in_week-p_dayno));
     IF v_start_offset < 0 THEN
       v_start_offset := v_start_offset+c_days_in_week;
     END IF;
-    v_end_dayno := to_char(p_date_end,'D'); 
+    v_end_dayno := to_number(to_char(p_date_end,'D')); 
     v_end_offset := v_end_dayno+(c_days_in_week-p_dayno);
     IF v_end_offset >= c_days_in_week THEN
       v_end_offset := v_end_offset-c_days_in_week;
@@ -895,7 +896,7 @@ CREATE OR REPLACE PACKAGE BODY util_date AS
 
     -- Count the holidays within the period
     FOR r_holiday IN holiday_cur(p_country_id, p_date_start, p_date_end) LOOP
-      v_dayno := to_char(r_holiday.holiday_date,'D');
+      v_dayno := to_number(to_char(r_holiday.holiday_date,'D'));
       IF v_dayno < gc_saturday OR (p_saturday_workday AND v_dayno = gc_saturday) OR (p_sunday_workday AND v_dayno = gc_sunday) THEN
         -- Only count weekends as holidays if they are usually working days, otherwise you may count a weekend twice as a non working day
         v_total_holidays := v_total_holidays+1;

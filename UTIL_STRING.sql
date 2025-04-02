@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE util_string AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : util_string
@@ -12,6 +12,8 @@ CREATE OR REPLACE PACKAGE util_string AS
   ** Date            Name                 Description
   **------------------------------------------------------------------------
   ** 16/06/2022      Ian Bond             Program created
+  ** 29/02/2024      Ian Bond             Add custom initcap function to handle
+  **                                      names like Mc and Mac using regexp.
   **   
   */
   
@@ -268,13 +270,29 @@ CREATE OR REPLACE PACKAGE util_string AS
   **   p_string        - String containing a list of values separated by commas
   **   p_order         - A for Ascending sort, any other value for Descending sort
   ** RETURN
-  **   <return datatype> <brief description>
+  **   VARCHAR2  is a string containg the sorted list
   ** EXCEPTIONS
   **   <exception_name1>      - <brief description>
   */
   FUNCTION sort_list (
     p_string IN VARCHAR2, 
     p_order  IN VARCHAR2 DEFAULT 'A'
+  ) RETURN VARCHAR2;
+  
+  /*
+  ** name_initcap - Capitalise the first letter of each word in a string (name), taking into
+  **                account names with a Mc, or Mac prefix.
+  **
+  **
+  ** IN
+  **   p_string        - String to be converted to initial capitals
+  ** RETURN
+  **   VARCHAR2  is a string with capitalised first letters of each word.  
+  ** EXCEPTIONS
+  **   <exception_name1>      - <brief description>
+  */
+  FUNCTION name_initcap (
+    p_string IN VARCHAR2
   ) RETURN VARCHAR2;
 
 
@@ -284,7 +302,7 @@ END util_string;
 
 CREATE OR REPLACE PACKAGE BODY util_string AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : util_string
@@ -296,6 +314,9 @@ CREATE OR REPLACE PACKAGE BODY util_string AS
   ** Date            Name                 Description
   **------------------------------------------------------------------------
   ** 16/06/2022      Ian Bond             Program created
+  ** 29/02/2024      Ian Bond             Add function name_initcap to Capitalise
+  **                                      first letter of each word in a name string
+  **                                      taking into account Mc and Mac prefixes.
   **   
   */
 
@@ -810,6 +831,24 @@ CREATE OR REPLACE PACKAGE BODY util_string AS
     END LOOP;
     RETURN v_result;
   END sort_list;
+  
 
+  FUNCTION name_initcap (
+    p_string IN VARCHAR2
+  )
+  RETURN VARCHAR2
+  IS
+  BEGIN
+    RETURN
+    CASE
+        WHEN REGEXP_LIKE(p_string,'(Mac[A-Z]|Mc[A-Z])') THEN p_string
+        WHEN REGEXP_LIKE(p_string,'(de[A-Z])') THEN p_string
+        WHEN REGEXP_LIKE(p_string,'(van\\s[A-Z])') THEN p_string
+        WHEN p_string LIKE '''%' THEN p_string
+        WHEN INITCAP(p_string) LIKE '_''S%' THEN p_string
+        ELSE REPLACE(INITCAP(p_string),'''S','''s')
+    END;
+  END name_initcap;  
+  
 END util_string;
 /

@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE plsql_constants AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : plsql_constants

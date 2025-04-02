@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE demo_string AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : demo_string
@@ -244,7 +244,7 @@ END demo_string;
 
 CREATE OR REPLACE PACKAGE BODY demo_string AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : demo_string

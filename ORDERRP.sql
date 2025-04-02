@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE orderrp AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : orderrp
@@ -96,7 +96,7 @@ END orderrp;
 
 CREATE OR REPLACE PACKAGE BODY orderrp AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : orderrp
