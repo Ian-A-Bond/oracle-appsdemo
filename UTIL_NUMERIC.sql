@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE util_numeric AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : util_numeric
@@ -12,7 +12,9 @@ CREATE OR REPLACE PACKAGE util_numeric AS
   ** Date            Name                 Description
   **------------------------------------------------------------------------
   ** 16/06/2022      Ian Bond             Program created
-  **   
+  ** 12/02/2024      Ian Bond             Add AI generated function num_to_alphanumeric
+  **                                      to convert integer to alphanumeric code.
+  ** 16/03/2024      Ian Bond             Add function to calculate pi   
   */
  
   /*  
@@ -142,6 +144,38 @@ CREATE OR REPLACE PACKAGE util_numeric AS
     p_string IN VARCHAR2, 
     p_order  IN VARCHAR2
   ) RETURN VARCHAR2;
+  
+  /*
+  ** num_to_alphanumeric - Convert integer to alphanumeric code
+  **
+  ** A copilot AI generated pl/sql function to convert numbers to an alphanumeric code where:
+  ** 1=A, 2=B, 26=Z, 27=AA, 28=AB, 52=AZ, 53=BA etc.
+  **
+  ** Here’s how the function works:
+  ** We start with the input number.
+  ** In each iteration, we calculate the remainder after dividing by 26 (the number of letters in the alphabet).
+  ** We convert the remainder to the corresponding letter (‘A’ for 1, ‘B’ for 2, and so on).
+  ** We prepend the letter to the result string.
+  ** We update the input number by subtracting the remainder and dividing by 26.
+  ** Repeat until the input number becomes zero.
+  ** Now you can use this function to convert numbers to the desired alphanumeric code. For example:
+  **
+  ** NUM_TO_ALPHANUMERIC(1) returns 'A'.
+  ** NUM_TO_ALPHANUMERIC(27) returns 'AA'.
+  ** NUM_TO_ALPHANUMERIC(52) returns 'AZ'.
+  ** NUM_TO_ALPHANUMERIC(53) returns 'BA'.
+  ** 
+  ** IN
+  **   p_number       - Positive integer to convert
+  ** RETURN
+  **   VARCHAR2  String containing the alphanumeric code
+  ** EXCEPTIONS
+  **   <exception_name1>      - <brief description>
+  */
+  FUNCTION num_to_alphanumeric (
+    p_number IN NUMBER
+  ) 
+  RETURN VARCHAR2;
 
   /*
   ** dectoalpha - Convert a decimal value to an alphabetic code
@@ -210,13 +244,23 @@ CREATE OR REPLACE PACKAGE util_numeric AS
     p_range IN INTEGER
   ) RETURN NUMBER;
 
+  /*
+  ** pi - Calculate pi to a reasonable accuracy
+  **
+  ** RETURN
+  **   NUMBER  Value of pi
+  **
+  */
+  FUNCTION pi
+    RETURN NUMBER;
+    
 END util_numeric;
 /
 
 
 CREATE OR REPLACE PACKAGE BODY util_numeric AS
   /*
-  ** (c) Bond & Pollard Ltd 2022
+  ** (c) Bond and Pollard Ltd 2022
   ** This software is free to use and modify at your own risk.
   ** 
   ** Module Name   : util_numeric
@@ -228,6 +272,8 @@ CREATE OR REPLACE PACKAGE BODY util_numeric AS
   ** Date            Name                 Description
   **------------------------------------------------------------------------
   ** 16/06/2022      Ian Bond             Program created
+  ** 12/02/2024      Ian Bond             Add AI generated function num_to_alphanumeric
+  **                                      to convert integer to alphanumeric code.
   **   
   */
 
@@ -389,6 +435,28 @@ CREATE OR REPLACE PACKAGE BODY util_numeric AS
     RETURN v_result;
   END sort_numbers;
 
+  FUNCTION num_to_alphanumeric(
+    p_number IN NUMBER
+  ) 
+  RETURN VARCHAR2
+  IS
+    v_result VARCHAR2(100);
+    v_base NUMBER := 26; -- Number of letters in the alphabet
+    v_calc NUMBER;
+    v_remainder NUMBER;
+  BEGIN
+    IF p_number <= 0 THEN
+        RETURN 'Invalid input. Please provide a positive number.';
+    END IF;
+    v_calc := p_number;
+    WHILE v_calc > 0 LOOP
+      v_remainder := MOD(v_calc  - 1, v_base) + 1; -- Adjust for 1-based indexing
+      v_result := CHR(ASCII('A') + v_remainder - 1) || v_result;
+      v_calc  := (v_calc - v_remainder) / v_base;
+    END LOOP;
+    RETURN v_result;
+  END num_to_alphanumeric;
+
   FUNCTION dectoalpha (
     p_number IN INTEGER, 
     p_range  IN INTEGER
@@ -463,6 +531,27 @@ CREATE OR REPLACE PACKAGE BODY util_numeric AS
     END LOOP;
     RETURN p_total;
   END alphatodec;
+  
+  FUNCTION pi 
+  RETURN NUMBER 
+  IS
+    last_pi NUMBER := 0;
+    delta   NUMBER := 0.000001;
+    pi      NUMBER := 1;
+    denom   NUMBER := 3;
+    oper    NUMBER := -1;
+    negone  NUMBER := -1;
+    two     NUMBER := 2;
+  BEGIN
+    LOOP
+      last_pi := pi;
+      pi := pi + oper * 1/denom;
+      EXIT WHEN (abs(last_pi-pi) <= delta );
+      denom := denom + two;
+      oper := oper * negone;
+    END LOOP;
+    RETURN pi*4;
+  END pi;
 
 END util_numeric;
 /
