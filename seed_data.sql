@@ -24,10 +24,10 @@
  * Set the schema name and password here *
  *****************************************
 */
-  DEFINE v_dbservice = &1
-  DEFINE v_dbconnect = &2
-  DEFINE v_app_owner = &3
-  DEFINE v_password  = &4
+  DEFINE v_dbservice = "&1"
+  DEFINE v_dbconnect = "&2"
+  DEFINE v_app_owner = "&3"
+  DEFINE v_password  = "&4"
 
   PROMPT Load data into &v_app_owner in database &v_dbservice
 

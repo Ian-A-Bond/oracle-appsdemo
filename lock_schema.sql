@@ -22,7 +22,7 @@
 ** 16/04/2023   Ian Bond      Created script
 */
 
-  CONNECT SYS@&v_dbconnect AS SYSDBA
+  CONNECT SYS/&v_sys_pwd@&v_dbconnect AS SYSDBA
   ALTER USER &v_app_owner ACCOUNT LOCK;
   ALTER USER &v_app_owner NO AUTHENTICATION;
 
